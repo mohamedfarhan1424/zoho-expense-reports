@@ -26,12 +26,50 @@ export default function ButtonAppBar() {
   const [select1, setSelect1] = useState(false);
   const [head, setHead] = useState("All");
   const [dialogopen, setDialogOpen] = useState(false);
+  const [reportName,setReportName]=useState("");
+  const [businessPurpose,setBusinessPurpose]=useState("");
+  const [startDate,setStartDate]=useState("");
+  const [endDate,setEndDate]=useState("");
+  const [names,setNames]=useState([]);
+  const [purposes,setPurposes]=useState([]);
+  const [starts,setStarts]=useState([]);
+  const [ends,setEnds]=useState([]);
+
+
+  const handleDelete=(index)=>{
+    const updatednames=names.filter((name,position)=>index!=position);
+    const updatedpurposes=purposes.filter((name,position)=>index!=position);
+    const updatedstarts=starts.filter((name,position)=>index!=position);
+    const updatedends=ends.filter((name,position)=>index!=position);
+    setNames(updatednames);
+    setPurposes(updatedpurposes);
+    setStarts(updatedstarts);
+    setEnds(updatedends);
+  }
+
+
+  const handleData=()=>{
+    setNames([...names,reportName]);
+    setPurposes([...purposes,businessPurpose]);
+    setStarts([...starts,startDate]);
+    setEnds([...ends,endDate]);
+    setReportName("");
+    setBusinessPurpose("");
+    setStartDate("");
+    setEndDate("");
+    handleDialogClose();
+
+  }
 
   const handleDialogOpen = () => {
     setDialogOpen(true);
   };
   const handleDialogClose = () => {
     setDialogOpen(false);
+    setReportName("");
+    setBusinessPurpose("");
+    setStartDate("");
+    setEndDate("");
   };
 
   const handleSelect = () => {
@@ -92,21 +130,13 @@ export default function ButtonAppBar() {
             </Button>
             <Menu
               className={styles.dropdown}
-              elevation={0.5}
+              elevation={1}
               id="fade-menu"
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
-              MenuProps={{
+              MenuListProps={{
                 "aria-labelledby": "basic-button",
-                anchorOrigin: {
-                  vertical: "bottom",
-                  horizontal: "left",
-                },
-                transformOrigin: {
-                  vertical: "top",
-                  horizontal: "left",
-                },
               }}
             >
               <span className={styles.dropdownhead}>DEFAULT</span>
@@ -189,16 +219,8 @@ export default function ButtonAppBar() {
               anchorEl={anchorEl1}
               open={open1}
               onClose={handleClose1}
-              MenuProps={{
+              MenuListProps={{
                 "aria-labelledby": "basic-button",
-                anchorOrigin: {
-                  vertical: "bottom",
-                  horizontal: "left",
-                },
-                transformOrigin: {
-                  vertical: "top",
-                  horizontal: "left",
-                },
               }}
             >
               <span className={styles.dropdownhead}>SORT BY</span>
@@ -242,7 +264,7 @@ export default function ButtonAppBar() {
           </div>
         </div>
       </div>
-      {select && (
+      {names.length==0 && select && (
         <div className={styles.pendingempty}>
           <div className={styles.image}>
             <Image src={HomeImage} />
@@ -269,7 +291,7 @@ export default function ButtonAppBar() {
           </div>
         </div>
       )}
-      {select1 && (
+      {names.length==0 && select1 && (
         <div className={styles.pendingempty}>
           <div className={styles.image}>
             <Image src={HomeImage} />
@@ -294,6 +316,55 @@ export default function ButtonAppBar() {
             </Typography>
             <Image src={LifeCycle} />
           </div>
+        </div>
+      )}
+      {names.length>0&&select&&names.map((name,index)=>(
+        <div className={styles.boxreport}>
+          <div className={styles.boxhead}>
+            <Typography variant="h5">{name}</Typography>
+            <button onClick={()=>handleDelete(index)}><img src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/24/000000/external-delete-multimedia-kiranshastry-solid-kiranshastry.png"/></button>
+          </div>
+          <hr className={styles.boxline}/>
+          <table>
+            <tr>
+              <th style={{opacity:"0.7"}}>Duration</th>
+              <th style={{opacity:"0.7"}}>Expenses</th>
+              <th style={{opacity:"0.7"}}>Total</th>
+              <th style={{opacity:"0.7"}}>Amount to be Reimbursed</th>
+            </tr>
+            <tr>
+              <td>{starts[index]} / {ends[index]}</td>
+              <td>0</td>
+              <td>&#8377; 0.00</td>
+              <td>&#8377; 0.00</td>
+            </tr>
+          </table>
+        </div>
+      ))
+        
+      }
+      {names.length>0&&select1&&(
+        <div className={styles.report}>
+          <table>
+            <tr>
+            <th>REPORT NAME</th>
+            <th>STATUS</th>
+            <th>APPROVER</th>
+            <th>TOTAL</th>
+            <th>TO BE REIMBURSED</th>
+            <th><img src="https://img.icons8.com/external-kiranshastry-gradient-kiranshastry/24/000000/external-search-logistic-delivery-kiranshastry-gradient-kiranshastry.png"/></th>
+            </tr>
+            {names.map((name,index)=>(
+              <tr>
+                <td><span className={styles.reporthead}>{name}</span> <br/> {starts[index]} / {ends[index]}</td>
+                <td>DRAFT</td>
+                <td>-</td>
+                <td>&#8377; 0.00</td>
+              <td>&#8377; 0.00</td>
+              <td><button onClick={()=>handleDelete(index)}><img src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/24/000000/external-delete-multimedia-kiranshastry-solid-kiranshastry.png"/></button></td>
+              </tr>
+            ))}
+          </table>
         </div>
       )}
       <Dialog
@@ -311,19 +382,19 @@ export default function ButtonAppBar() {
           <DialogContentText>
             <div>
               <h5>Report name*</h5>
-              <TextField placeholder="eg:Trip to New York" className={styles.textfield} />
+              <TextField value={reportName} onChange={(e)=>setReportName(e.target.value)} placeholder="eg:Trip to New York" className={styles.textfield} />
               <h5>Business Purpose</h5>
-              <TextField placeholder="max 500 characters" className={styles.textfield} />
+              <TextField value={businessPurpose} onChange={(e)=>setBusinessPurpose(e.target.value)} placeholder="max 500 characters" className={styles.textfield} />
               <h5>Duration</h5>
               <div className={styles.duration}>
-                <TextField type="date" className={styles.durfield} />
-                <TextField type="date" className={styles.durfield} />
+                <TextField value={startDate} onChange={(e)=>setStartDate(e.target.value)} type="date" className={styles.durfield} />
+                <TextField value={endDate} onChange={(e)=>setEndDate(e.target.value)} type="date" className={styles.durfield} />
               </div>
             </div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" className={styles.new}>Save</Button>
+          <Button variant="contained" onClick={handleData} className={styles.new}>Save</Button>
           <Button variant="outlined" onClick={handleDialogClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
